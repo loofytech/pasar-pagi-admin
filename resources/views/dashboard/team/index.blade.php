@@ -2,17 +2,17 @@
 
 @section('content')
 <div class="row">
-  <div class="col-12">
+  <div class="col-sm-12">
     <div class="card">
-      <div class="card-header fw-bolder bg-primary text-white">KATEGORI PRODUK</div>
+      <div class="card-header fw-bolder bg-primary text-white">TIM PASAR PAGI</div>
       <div class="card-body">
-        <button class="btn btn-primary fs-2" data-bs-toggle="modal" data-bs-target="#create">TAMBAH KATEGORI</button>
+        <button class="btn btn-primary fs-2" data-bs-toggle="modal" data-bs-target="#create">TAMBAH TIM</button>
         <table class="w-100" id="tables">
           <thead class="text-white border-0" style="background: #5D87FF">
             <tr class="border-0">
-              <td class="border-0 py-3 all text-center" style="border: 1px solid #5D87FF !important" data-priority="1">No.</td>
-              <td class="all text-center" style="border: 1px solid #5D87FF !important">Nama Kategori</td>
-              <td class="all text-center" style="border: 1px solid #5D87FF !important">Kategori Status</td>
+              <td class="all text-center" style="border: 1px solid #5D87FF !important"></td>
+              <td class="all text-left py-3" style="border: 1px solid #5D87FF !important">Nama</td>
+              <td class="all text-left" style="border: 1px solid #5D87FF !important">Jabatan</td>
               <td class="all text-center" style="border: 1px solid #5D87FF !important">Aksi</td>
             </tr>
           </thead>
@@ -25,14 +25,22 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Tambah Kategori</h5>
+        <h5 class="modal-title">Tambah Tim</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="create">
+          <div class="mb-2">
+            <label for="name" class="form-label">Nama</label>
+            <input type="text" class="form-control" id="name" name="name" autocomplete="off">
+          </div>
+          <div class="mb-2">
+            <label for="position" class="form-label">Posisi</label>
+            <input type="text" class="form-control" id="position" name="position" autocomplete="off">
+          </div>
           <div class="mb-3">
-            <label for="category_name" class="form-label">Nama Kategori</label>
-            <input type="text" class="form-control" id="category_name" name="category_name" autocomplete="off">
+            <label for="photo" class="form-label">Foto</label>
+            <input type="file" class="form-control" id="photo" name="photo" autocomplete="off">
           </div>
           <div>
             <button type="submit" id="submit" class="btn btn-primary">Submit</button>
@@ -66,10 +74,6 @@
   let table = null;
 
   $(document).ready(function() {
-    if (screen.width <= 512) {
-      $.fn.DataTable.ext.pager.numbers_length = 9999999999;
-    }
-
     table = $('#tables').DataTable({
       "serverSide": true,
       "responsive": true,
@@ -88,15 +92,15 @@
       "pageLength": 10,
       "lengthMenu": [10, 25, 50, 100],
       "dom": `
-        <'flex-grow py-1 justify-self-end sm:justify-self-center'f>
-        <'row'<'col-sm-12 mt-1 mb-3'tr>>
+        <'flex-grow justify-self-end sm:justify-self-center'f>
+        <'row'<'col-sm-12 mt-0 mb-3'tr>>
         <'flex flex-row flex-wrap w-full justify-start items-center'<'flex-none justify-self-start px-1 py-1'l><'lhx flex-none justify-self-start px-1 py-1'i><'flex-grow px-1 py-1 justify-self-end fxx'p>>
       `,
       "targets": 'no-sort',
       "bSort": false,
       "order": [],
       "ajax": {
-        "url": "{{ route('category.data') }}",
+        "url": "{{ route('team.data') }}",
         "type": "POST",
         beforeSend: function(request) {
             request.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}')
@@ -157,22 +161,20 @@
       },
       "columns": [
         {
-          data: null,
+          data: "photo",
           render: function(data, type, row, meta) {
-            return `<div class="text-center">${meta.row + meta.settings._iDisplayStart + 1}</div>`
+            return `<div class="d-flex justify-content-center">
+              <div style="width: 100px; height: 100px" class="rounded-circle overflow-hidden">
+                <img src="/teams/${data}" class="img-fluid" />
+              </div>
+            </div>`
           }
         },
         {
-          data: "category_name"
+          data: "name"
         },
         {
-          data: "category_status",
-          render: function(data, type, row, meta) {
-            if (data == 1) {
-              return `<div class="text-center"><span class="badge bg-primary">Kategori Aktif</span></div>`
-            }
-            return `<span class="badge bg-danger">Kategori Tidak Aktif</span>`
-          }
+          data: "position"
         },
         {
           data: "id",
@@ -215,13 +217,20 @@
 
   $('form#create').submit(function(e) {
     e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('_token', '{{ csrf_token() }}');
+    formData.append('name', $('#name').val());
+    formData.append('position', $('#position').val());
+    formData.append('photo', $('#photo').prop('files')[0]);
+
     $.ajax({
-      url: '{{ route("category.store") }}',
+      url: '{{ route("team.store") }}',
       method: 'POST',
-      data: {
-        _token: '{{ csrf_token() }}',
-        category_name: $('#category_name').val()
-      },
+      cache: false,
+      contentType: false,
+      processData: false,
+      data: formData,
       beforeSend: function() {
         $('#submit').prop('disabled', true);
       },

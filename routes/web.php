@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
@@ -42,5 +43,11 @@ Route::prefix('dashboard')->group(function () {
         Route::get('', 'index')->name('team.index');
         Route::post('store', 'store')->name('team.store');
         Route::post('data', 'getData')->name('team.data');
+    });
+    // Galleries
+    Route::group(['prefix' => 'gallery', 'controller' => GalleryController::class], function() {
+        Route::get('', 'index')->name('gallery.index');
+        Route::post('data', 'data')->name('gallery.data');
+        Route::post('store', 'storeGallery')->name('gallery.store.gallery');
     });
 });

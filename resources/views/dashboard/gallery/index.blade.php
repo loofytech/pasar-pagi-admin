@@ -40,11 +40,11 @@
           </div>
           <div class="mb-3">
             <label for="">Photo</label>
-            <div class="d-flex flex-wrap gap-3 mt-1">
-              <label for="dump-photo-0" onclick="checkIndex(this)" class="border border-3 d-flex align-items-center justify-content-center dump-photo" data-index="0">
-                <input type="file" class="d-none" name="photos" id="dump-photo-0">
+            <div class="d-flex flex-wrap gap-3 mt-1" id="wrap-photo">
+              <div onclick="checkIndex(this)" class="border border-3 d-flex align-items-center justify-content-center dump-photo">
+                <input type="file" class="d-none" name="photos" id="dump-photo">
                 <i class="ti ti-camera-plus" style="font-size: 24px"></i>
-              </label>
+              </div>
             </div>
           </div>
           <div>
@@ -67,6 +67,32 @@
     border-style: dashed !important;
     cursor: pointer;
   }
+  .dump-result {
+    width: 100px;
+    height: 100px;
+  }
+  .bsbs:hover .bbbs {
+    z-index: 1;
+  }
+  .bbbs {
+    position: absolute;
+    content: '';
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .trS {
+    background: url('/trash-filled.svg');
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
   #tables_filter label {
     width: 30%;
   }
@@ -84,6 +110,8 @@
 <script src="{{ asset('datatables/datatables.min.js') }}"></script>
 <script>
   let table = null;
+  let photos = [];
+  let result = 0;
 
   $(document).ready(function() {
     table = $('#tables').DataTable({
@@ -231,6 +259,7 @@
     formData.append('_token', '{{ csrf_token() }}');
     formData.append('title', $('#title').val());
     formData.append('description', $('#description').val());
+    photos.forEach(obj => formData.append('photos[]', obj));
 
     $.ajax({
       url: '{{ route("gallery.store.gallery") }}',
@@ -251,18 +280,50 @@
     });
   });
 
-  const photos = [];
+  $(`#dump-photo`).on('change', function(e) {
+    file = $(this).prop('files')[0];
+    var oFReader = new FileReader();
+    oFReader.readAsDataURL(file);
+    oFReader.onload = function (oFREvent) {
+      const cWrps = document.createElement('div');
+      cWrps.id = `result-${result}`
+      cWrps.classList.add('position-relative');
+      cWrps.classList.add('bsbs');
+      const cxMp = document.createElement('div');
+      cxMp.id = `ing-${result}`;
+      cxMp.classList.add('bbbs');
+      const trS = document.createElement('i');
+      trS.classList.add('trS');
+      trS.setAttribute('onclick', `erasePhoto(this, ${result})`)
+      const cImg = document.createElement('img');
+      cImg.classList.add('dump-result');
+      cImg.src = oFREvent.target.result;
+      document.getElementById('wrap-photo').append(cWrps);
+      document.getElementById(`result-${result}`).append(cxMp);
+      document.getElementById(`result-${result}`).append(cImg);
+      document.getElementById(`ing-${result}`).append(trS);
+
+      result = result + 1;
+    }
+
+    photos.push(file);
+    $(this).val('');
+  });
 
   function checkIndex(element) {
-    const index = $(element).data('index');
-    $(`#dump-photo-${index}`).on('change', function(e) {
-      if (typeof $(this).prop('files')[0] == 'undefined') {
-        return photos.splice(index, 1);
-      }
-      return photos[index] = $(this).prop('files')[0];
-    });
+    $(`#dump-photo`)[0].click();
+  }
 
-    console.log(photos);
+  function erasePhoto(element, position) {
+    photos.splice(position, 1);
+    document.querySelector(`#result-${position}`).remove();
+    document.querySelectorAll('.bsbs').forEach((e, i) => {
+      result = i;
+      e.setAttribute('id', `result-${result}`);
+      e.children[0].setAttribute('id', `ing-${result}`);
+      e.children[0].children[0].setAttribute('onclick', `erasePhoto(this, ${result})`);
+    });
+    if (!document.querySelector('.bsbs')) result = 0;
   }
 </script>
 @endpush

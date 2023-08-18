@@ -31,14 +31,14 @@ class GalleryController extends Controller
 
             if ($request->photos) {
                 foreach ($request->photos as $key => $photo) {
-                    $imageName = time() .'.'. $photo->extension();
+                    $imageName = time() . $key .'.'. $photo->extension();
 
                     $gI = new GalleryImage();
                     $gI->gallery_id = $g->id;
                     $gI->photo = $imageName;
                     $gI->save();
 
-                    $photo->move(public_path('teams'), $imageName);
+                    $photo->move(public_path('projects'), $imageName);
                 }
             }
 

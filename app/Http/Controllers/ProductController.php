@@ -7,6 +7,7 @@ use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -30,7 +31,8 @@ class ProductController extends Controller
 
             $p = new Product();
             $p->product_name = $request->product_name;
-            $p->product_description = $request->product_description;
+            $p->product_slug = Str::slug($request->product_name, '-');
+            $p->description = $request->product_description;
             $p->price = $request->price;
             $p->stock = $request->stock;
             $p->save();

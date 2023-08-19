@@ -132,7 +132,7 @@
         $('#submit').prop('disabled', true);
       },
       success: function(data) {
-        return location.reload();
+        return location.href = '{{ route("product.index") }}';
       },
       error: function(err) {
         $('#submit').prop('disabled', false);

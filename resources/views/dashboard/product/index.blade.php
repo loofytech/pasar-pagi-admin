@@ -10,10 +10,10 @@
         <table class="w-100" id="tables">
           <thead class="text-white border-0" style="background: #5D87FF">
             <tr class="border-0">
-              <td class="all text-left py-3 ps-3" style="border: 1px solid #5D87FF !important">Nama</td>
-              <td class="all text-left ps-3" style="border: 1px solid #5D87FF !important">Deskripsi</td>
-              <td class="all text-left" style="border: 1px solid #5D87FF !important">Harga</td>
-              <td class="all text-left" style="border: 1px solid #5D87FF !important">Stok</td>
+              <td class="all text-left py-3 ps-3 w-100" style="border: 1px solid #5D87FF !important">Nama</td>
+              {{-- <td class="all text-left ps-2" style="border: 1px solid #5D87FF !important">Deskripsi</td> --}}
+              <td class="all text-left ps-2" style="border: 1px solid #5D87FF !important">Harga</td>
+              <td class="all text-left ps-2" style="border: 1px solid #5D87FF !important">Stok</td>
               <td class="all text-center" style="border: 1px solid #5D87FF !important">Aksi</td>
             </tr>
           </thead>
@@ -36,6 +36,14 @@
   }
   table tbody tr td {
     padding: 10px;
+  }
+  .trimTxt {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    margin-bottom: 0;
   }
 </style>
 @endpush
@@ -129,17 +137,32 @@
               pbItems.forEach(element => child.append(element))
             }
           }
+
+          // $('#tables tbody tr').each(function(i) {
+          //   const dxd = $(this).children()[1];
+          //   dxd.innerHTML = dxd.textContent;
+          //   dxd.children[0].classList.add('trimTxt');
+          // });
         },
       },
       "columns": [
         {
-          data: "product_name"
+          data: "product_name",
+          render: function (data, type, row, meta) {
+            return `<div class="trimTxt">${data}</div>`;
+          }
         },
+        // {
+        //   data: "description",
+        //   render: function (data, type, row, meta) {
+        //     return data;
+        //   }
+        // },
         {
-          data: "description"
-        },
-        {
-          data: "price"
+          data: "price",
+          render: function (data, type, row, meta) {
+            return `<div class="text-nowrap">Rp ${data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}</div>`;
+          }
         },
         {
           data: "stock"

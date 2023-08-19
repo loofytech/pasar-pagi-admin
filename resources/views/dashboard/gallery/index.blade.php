@@ -282,7 +282,7 @@
 
   $(`#dump-photo`).on('change', function(e) {
     file = $(this).prop('files')[0];
-    var oFReader = new FileReader();
+    const oFReader = new FileReader();
     oFReader.readAsDataURL(file);
     oFReader.onload = function (oFREvent) {
       const cWrps = document.createElement('div');

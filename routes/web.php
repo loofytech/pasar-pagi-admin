@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
@@ -49,5 +50,12 @@ Route::prefix('dashboard')->group(function () {
         Route::get('', 'index')->name('gallery.index');
         Route::post('data', 'data')->name('gallery.data');
         Route::post('store', 'storeGallery')->name('gallery.store.gallery');
+    });
+    // Products
+    Route::group(['prefix' => 'products', 'controller' => ProductController::class], function() {
+        Route::get('', 'index')->name('product.index');
+        Route::post('data', 'data')->name('product.data');
+        Route::get('create', 'create')->name('product.create');
+        Route::post('store', 'store')->name('product.store');
     });
 });
